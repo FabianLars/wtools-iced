@@ -5,7 +5,6 @@ use iced::{
     Column, Command, Container, Element, HorizontalAlignment, Length, Row, Scrollable, Settings,
     Text, TextInput,
 };
-use native_dialog::{Dialog, OpenMultipleFile};
 
 use wtools::{api, PathType, WikiClient};
 
@@ -304,7 +303,7 @@ impl Application for App {
                             Row::new()
                                 .push(Checkbox::new(
                                     self.state.is_persistent,
-                                    "Stay logged in (stored locally on your device)",
+                                    "Remember me",
                                     Message::CheckboxPersistentLogin,
                                 ))
                                 .push(
@@ -368,13 +367,13 @@ impl Application for App {
 }
 
 async fn file_dialog() -> Result<PathType, ()> {
-    let dialog = OpenMultipleFile {
-        dir: None,
-        filter: None,
-    };
-    let result = tokio::task::spawn_blocking(|| dialog.show().unwrap())
-        .await
-        .map_err(|_| ())?;
+    let result = tokio::task::spawn_blocking(|| {
+        native_dialog::FileDialog::new()
+            .show_open_multiple_file()
+            .unwrap()
+    })
+    .await
+    .map_err(|_| ())?;
 
     let mut temp: Vec<PathBuf> = Vec::new();
     for f in result {
@@ -405,8 +404,8 @@ struct SavedState {
 
 impl SavedState {
     async fn load() -> Result<SavedState, ()> {
-        let lp_input_value = storage::get_secure("b9c95dde").await.unwrap_or_default();
-        let ln_input_value = storage::get_secure("d7f0942b").await.unwrap_or_default();
+        let ln_input_value = storage::get_secure("b9c95dde").await.unwrap_or_default();
+        let lp_input_value = storage::get_secure("d7f0942b").await.unwrap_or_default();
         let wikiurl = storage::get("wikiurl")
             .await
             .unwrap_or_else(|_| String::from("https://leagueoflegends.fandom.com/de/api.php"));
@@ -428,13 +427,13 @@ impl SavedState {
     async fn save(self) -> Result<(), ()> {
         storage::insert_multiple(&[
             (
-                "d7f0942b",
+                "b9c95dde",
                 storage::encrypt(&self.ln_input_value)
                     .map_err(|e| println!("Error encrypting password: {}", e))?
                     .as_slice(),
             ),
             (
-                "b9c95dde",
+                "d7f0942b",
                 storage::encrypt(&self.lp_input_value)
                     .map_err(|e| println!("Error encrypting name: {}", e))?
                     .as_slice(),
