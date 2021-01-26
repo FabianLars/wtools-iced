@@ -164,6 +164,7 @@ impl Application for App {
                                 api::upload::upload(
                                     self.wk_client.clone(),
                                     self.state.selected_files.clone(),
+                                    None,
                                 )
                                 .map_err(|_| ()),
                                 Message::Executed,
