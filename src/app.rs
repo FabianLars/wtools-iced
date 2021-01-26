@@ -6,7 +6,7 @@ use iced::{
     Text, TextInput,
 };
 
-use wtools::{api, PathType, WikiClient};
+use wtools::{api, WikiClient};
 
 use crate::style;
 
@@ -40,7 +40,7 @@ struct State {
 
     file_button: button::State,
     execute_button: button::State,
-    selected_files: PathType,
+    selected_files: Vec<PathBuf>,
     upload_scrollable: scrollable::State,
     saving: bool,
 }
@@ -71,7 +71,7 @@ enum Message {
     LoginButtonPressed,
     LoggedIn(Result<WikiClient, ()>),
     FileButtonPressed,
-    FilesSelected(Result<PathType, ()>),
+    FilesSelected(Result<Vec<PathBuf>, ()>),
     ExecuteButtonPressed,
     Executed(Result<(), ()>),
 }
@@ -154,7 +154,7 @@ impl Application for App {
                         if let Tab::Upload = self.state.active_tab {
                             self.state.selected_files = match files {
                                 Ok(p) => p,
-                                Err(_) => PathType::default(),
+                                Err(_) => Vec::new(),
                             }
                         }
                     }
@@ -246,23 +246,9 @@ impl Application for App {
                     );
 
                 let mut text_files = String::new();
-                match &self.state.selected_files {
-                    PathType::File(x) => text_files.push_str(match x.file_name() {
-                        Some(s) => s.to_str().unwrap(),
-                        None => "",
-                    }),
-                    PathType::Files(x) => {
-                        for f in x {
-                            text_files.push_str(f.file_name().unwrap().to_str().unwrap());
-                            text_files.push_str("\n");
-                        }
-                    }
-                    PathType::Folder(x) => {
-                        for f in std::fs::read_dir(x).unwrap() {
-                            text_files.push_str(f.unwrap().file_name().to_str().unwrap());
-                            text_files.push_str("\n");
-                        }
-                    }
+                for file in &self.state.selected_files {
+                    text_files.push_str(&file.display().to_string());
+                    text_files.push_str("\n");
                 }
 
                 let tab_container = Container::new(match &self.state.active_tab {
@@ -367,7 +353,7 @@ impl Application for App {
     }
 }
 
-async fn file_dialog() -> Result<PathType, ()> {
+async fn file_dialog() -> Result<Vec<PathBuf>, ()> {
     let result = tokio::task::spawn_blocking(|| {
         native_dialog::FileDialog::new()
             .show_open_multiple_file()
@@ -380,7 +366,7 @@ async fn file_dialog() -> Result<PathType, ()> {
     for f in result {
         temp.push(f);
     }
-    Ok(PathType::Files(temp))
+    Ok(temp)
 }
 
 fn loading_message() -> Element<'static, Message> {
