@@ -6,7 +6,7 @@ use iced::{
     Text, TextInput,
 };
 
-use wtools::{api, WikiClient};
+use mw_toolbox::{api, WikiClient};
 
 use crate::style;
 
@@ -92,7 +92,7 @@ impl Application for App {
     }
 
     fn title(&self) -> String {
-        String::from("wtools by FabianLars")
+        String::from("mw-toolbox by FabianLars")
     }
 
     fn update(&mut self, message: Message) -> Command<Message> {

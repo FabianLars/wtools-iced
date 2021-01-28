@@ -10,8 +10,8 @@ version = "0.1.0"
 winres = "0.1"
 
 [dependencies]
-storage = {git = "https://github.com/FabianLars/wtools"}
-wtools = {git = "https://github.com/FabianLars/wtools"}
+mw-toolbox = {git = "https://github.com/FabianLars/mw-toolbox"}
+storage = {git = "https://github.com/FabianLars/mw-toolbox"}
 
 anyhow = "1"
 directories = "3"
