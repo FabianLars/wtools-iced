@@ -6,7 +6,7 @@ use iced::{
     Text, TextInput,
 };
 
-use mw_toolbox::{api, WikiClient};
+use mw_tools::{api, WikiClient};
 
 use crate::style;
 
