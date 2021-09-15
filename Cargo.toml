@@ -14,7 +14,7 @@ mw-tools = {git = "https://github.com/FabianLars/mw-toolbox", branch = "main"}
 storage = {git = "https://github.com/FabianLars/mw-toolbox", branch = "main"}
 
 anyhow = "1"
-directories = "3"
+directories = "4"
 iced = {git = "https://github.com/hecrj/iced.git", branch = "master", default-features = false, features = ["tokio", "glow", "glow_default_system_font"]}
 native-dialog = {version = "0", features = ["windows_dpi_awareness", "windows_visual_styles"]}
 tokio = {version = "1", features = ["rt"]}
